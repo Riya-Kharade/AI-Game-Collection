@@ -3,7 +3,7 @@ A collection of classic games enhanced with AI algorithms like Minimax, Pathfind
 
 # AI Game Collection 🎮🤖
 
-**Live Demo**: [ai-games-by-riya.netlify.app](https://ai-games-by-riya.netlify.app/)  
+**Live Demo**: [ai-games-by-riya.netlify.app](https:https://ai-game-collection-byriya.netlify.app/)  
 
 A web-based collection of classic games powered by AI algorithms. Each game demonstrates a different AI technique — from search algorithms and heuristics to computer vision and rule‑based reasoning.
 
