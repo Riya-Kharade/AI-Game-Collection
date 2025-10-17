@@ -4,73 +4,126 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Game Collection 🎮</title>
+
+  <!-- Font Awesome CDN for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
   <style>
+    /* General Styles */
     body {
       font-family: "Poppins", sans-serif;
       background: linear-gradient(135deg, #1e1f29, #282a36);
       color: white;
-      text-align: center;
-      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+    a { text-decoration: none; color: white; }
+
+    /* Header */
+    header {
       display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 20px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 50px;
+      background-color: rgba(40, 42, 54, 0.95);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      flex-wrap: wrap;
+    }
+    header h1 {
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+      flex-wrap: wrap;
+    }
+    nav ul li {
+      margin-left: 25px;
+      position: relative;
+    }
+    nav ul li a {
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 8px 12px;
+      border-radius: 5px;
+      transition: background 0.3s;
+      display: block;
+    }
+    nav ul li a:hover {
+      background: #6c63ff;
     }
 
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
+    /* Dropdown */
+    nav ul li .dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: rgba(40, 42, 54, 0.95);
+      border-radius: 8px;
+      overflow: hidden;
+      min-width: 180px;
+      z-index: 100;
     }
-
-    p {
-      font-size: 1.1rem;
-      color: #ccc;
-      margin-bottom: 40px;
+    nav ul li:hover .dropdown {
+      display: block;
     }
+    nav ul li .dropdown a {
+      display: block;
+      padding: 10px 15px;
+      font-weight: 400;
+      color: white;
+      transition: background 0.3s;
+    }
+    nav ul li .dropdown a:hover { background: #6c63ff; }
 
-   .game-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* exactly 3 cards per row */
-  gap: 40px; /* space between cards */
-  justify-items: center;
-  margin: 50px auto;
-  width: 90%; /* optional, keeps it centered nicely */
-}
+    /* Main Section */
+    main {
+      text-align: center;
+      padding: 80px 20px 40px;
+    }
+    h2 { font-size: 2.5rem; margin-bottom: 10px; }
+    p.subtitle { font-size: 1.1rem; color: #ccc; margin-bottom: 50px; }
 
+    /* Game Cards */
+    .game-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+      justify-items: center;
+      margin: 0 auto 80px;
+      width: 90%;
+    }
     .game-card {
       background: rgba(255, 255, 255, 0.08);
       border-radius: 15px;
-      padding: 25px;
-      width: 250px;
+      padding: 30px 20px;
+      width: 300px;
       transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
       display: flex;
       flex-direction: column;
       align-items: center;
+      text-align: center;
     }
-
     .game-card:hover {
       transform: translateY(-12px) scale(1.05);
       background: rgba(255, 255, 255, 0.15);
       box-shadow: 0 15px 25px rgba(0,0,0,0.4);
     }
-
     .game-card img {
-      width: 100px;
-      height: 100px;
+      width: 120px;
+      height: 120px;
       margin-bottom: 15px;
+      border-radius: 10px;
     }
-
-    .game-card h3 {
-      font-size: 1.3rem;
-      margin-bottom: 5px;
-    }
-
-    .game-card p {
-      font-size: 0.95rem;
-      color: #ccc;
-      margin-bottom: 15px;
-    }
-
+    .game-card h3 { font-size: 1.3rem; margin-bottom: 10px; }
+    .game-card p { font-size: 1rem; color: #ccc; margin-bottom: 15px; }
     .game-card button {
       background: #6c63ff;
       border: none;
@@ -81,92 +134,208 @@
       cursor: pointer;
       transition: 0.3s;
     }
+    .game-card button:hover { background: #5a54e3; }
 
-    .game-card button:hover {
-      background: #5a54e3;
+    /* About & Contact Cards */
+    .card-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .info-card {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+      text-align: center;
+    }
+    .info-card i {
+      font-size: 2rem;
+      margin-bottom: 15px;
+      color: #6c63ff;
+    }
+    .info-card h3 { font-size: 1.8rem; margin-bottom: 15px; color: #fff; }
+    .info-card p { font-size: 1.05rem; color: #ccc; line-height: 1.6; }
+    .info-card:hover {
+      transform: translateY(-10px);
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 20px 35px rgba(0,0,0,0.6);
     }
 
+    /* Footer */
     footer {
-      margin-top: 40px;
+      background-color: rgba(40, 42, 54, 0.95);
+      padding: 20px 50px;
+      text-align: center;
       color: #999;
       font-size: 0.9rem;
+      border-top: 1px solid #6c63ff;
+    }
+    footer a { color: #6c63ff; text-decoration: none; margin: 0 5px; }
+    footer a:hover { text-decoration: underline; }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      header { flex-direction: column; align-items: flex-start; padding: 15px 20px; }
+      nav ul { flex-direction: column; width: 100%; }
+      nav ul li { margin-left: 0; width: 100%; }
+      nav ul li a { padding: 10px 15px; }
+      nav ul li .dropdown { position: relative; top: 0; left: 0; min-width: 100%; border-radius: 0 0 10px 10px; }
+      .game-container { grid-template-columns: repeat(2, 1fr); gap: 25px; }
+      .card-container { grid-template-columns: repeat(2, 1fr); gap: 25px; }
+    }
+
+    @media (max-width: 600px) {
+      header { align-items: center; }
+      header h1 { font-size: 1.5rem; }
+      nav ul { align-items: center; }
+      nav ul li a { padding: 8px 12px; }
+      nav ul li .dropdown a { padding: 8px 12px; }
+      .game-container { grid-template-columns: 1fr; gap: 20px; }
+      .game-card { width: 90%; padding: 20px 15px; }
+      .game-card img { width: 100px; height: 100px; }
+      .info-card { padding: 25px 20px; }
+      .info-card h3 { font-size: 1.4rem; }
+      .info-card p { font-size: 1rem; }
+      .card-container { grid-template-columns: 1fr; gap: 20px; }
     }
   </style>
 </head>
 <body>
-  <h1>🎮 AI Game Collection</h1>
-  <p>Play fun AI-powered games  powered by Python and AI!</p>
 
-  <div class="game-container">
+  <!-- Header -->
+  <header>
+    <h1 onclick="window.location.href='#'"><i class="fa-solid fa-gamepad"></i> AI Games</h1>
+    <nav>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li>
+          <a href="#">Games ▾</a>
+          <div class="dropdown">
+            <a href="snake-game/snake.html"><i class="fa-solid fa-snake"></i> Snake</a>
+            <a href="tic-tac-toe-minimax-master/tic-toc.html"><i class="fa-solid fa-xmark"></i> Tic Tac Toe</a>
+            <a href="connect-four/connect_four.html"><i class="fa-solid fa-circle-check"></i> Connect Four</a>
+            <a href="rock-paper-scissors.html"><i class="fa-solid fa-hand-rock"></i> Rock Paper Scissors</a>
+            <a href="guess-the-word/guess.html"><i class="fa-solid fa-lightbulb"></i> Guess the Word</a>
+            <a href="2048-ai/2048.html"><i class="fa-solid fa-square"></i> 2048 AI</a>
+            <a href="sudoku-solver/sudoku.html"><i class="fa-solid fa-grip-lines"></i> Sudoku Solver</a>
+          </div>
+        </li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
 
+  <!-- Main Section -->
+  <main>
+    <h2>🎮 AI Game Collection</h2>
+    <p class="subtitle">Play fun AI-powered games powered by Python and AI!</p>
 
-    <!-- Game 2: Snake Game -->
-    <div class="game-card">
-<img src="snake-game/snake.jpg" alt="Snake Game">
-      <h3>Snake Game (Pathfinding)</h3>
-      <p>AI finds the optimal path to eat food and avoid obstacles.</p>
-      <button onclick="window.location.href='snake-game/snake.html'">Play Game</button>
+    <div class="game-container">
+      <!-- Game Cards -->
+      <div class="game-card">
+        <img src="snake-game/snake.jpg" alt="Snake Game">
+        <h3>Snake Game</h3>
+        <p><i class="fa-solid fa-route"></i> AI finds the optimal path to eat food and avoid obstacles.</p>
+        <button onclick="window.location.href='snake-game/snake.html'">Play Game</button>
+      </div>
+
+      <div class="game-card">
+        <img src="snake-game/tic-toc.jpg" alt="Tic Tac Toe">
+        <h3>Tic Tac Toe</h3>
+        <p><i class="fa-solid fa-brain"></i> AI uses Minimax algorithm for perfect moves.</p>
+        <button onclick="window.location.href='tic-tac-toe-minimax-master/tic-toc.html'">Play Game</button>
+      </div>
+
+      <div class="game-card">
+        <img src="snake-game/connect.jpg" alt="Connect Four">
+        <h3>Connect Four</h3>
+        <p><i class="fa-solid fa-chess"></i> AI uses Minimax & Alpha-Beta pruning techniques.</p>
+        <button onclick="window.location.href='connect-four/connect_four.html'">Play Game</button>
+      </div>
+
+      <div class="game-card">
+        <img src="snake-game/rock.jpg" alt="Rock Paper Scissors">
+        <h3>Rock Paper Scissors</h3>
+        <p><i class="fa-solid fa-hand-rock"></i> Play using hand gestures detected by AI & OpenCV.</p>
+        <button onclick="runRockPaper()">Play Game</button>
+      </div>
+
+      <div class="game-card">
+        <img src="snake-game/guess.jpg" alt="Guess the Word">
+        <h3>Guess the Word</h3>
+        <p><i class="fa-solid fa-lightbulb"></i> Rule-based AI helps you guess the word step by step.</p>
+        <button onclick="window.location.href='guess-the-word/guess.html'">Play Game</button>
+      </div>
+
+      <div class="game-card">
+        <img src="snake-game/2048.jpg" alt="2048 AI">
+        <h3>2048 AI</h3>
+        <p><i class="fa-solid fa-square"></i> AI uses heuristic search to reach 2048 tiles faster.</p>
+        <button onclick="window.location.href='2048-ai/2048.html'">Play Game</button>
+      </div>
+
+      <div class="game-card">
+        <img src="snake-game/sudoko.png" alt="Sudoku Solver">
+        <h3>Sudoku Solver</h3>
+        <p><i class="fa-solid fa-grip-lines"></i> Enter a puzzle and AI solves it using backtracking.</p>
+        <button onclick="window.location.href='sudoku-solver/sudoku.html'">Play Game</button>
+      </div>
     </div>
+  </main>
 
-
-    <!-- Game: Tic Tac Toe -->
-<div class="game-card">
-<img src="snake-game/tic-toc.jpg" alt="Snake Game">
-  <h3>Tic Tac Toe (Minimax AI)</h3>
-  <p>Play Tic Tac Toe against an AI using the Minimax algorithm for perfect moves.</p>
-  <button onclick="window.location.href='tic-tac-toe-minimax-master/tic-toc.html'">Play Game</button>
-</div>
-
-
-    <!-- Game 3: Guess the Word -->
-    <div class="game-card">
-<img src="snake-game/guess.jpg" alt="Snake Game">
-      <h3>Guess the Word (Knowledge Representation )</h3>
-      <p>Rule-based AI helps you guess the word step by step.</p>
-      <button onclick="window.location.href='guess-the-word/guess.html'">Play Game</button>
+  <!-- About Section -->
+  <section id="about" style="padding:80px 20px; text-align:center; background: #1e1f29;">
+    <h2 style="margin-bottom:50px; font-size:2.5rem;">About <i class="fa-solid fa-info-circle"></i></h2>
+    <div class="card-container">
+      <div class="info-card">
+        <i class="fa-solid fa-gamepad"></i>
+        <h3>Our Project</h3>
+        <p>The AI Game Collection is a set of interactive games demonstrating different AI techniques such as Minimax, Alpha-Beta Pruning, Pathfinding, Heuristic Search, Backtracking, Knowledge Representation, and Vision AI.</p>
+      </div>
+      <div class="info-card">
+        <i class="fa-solid fa-bullseye"></i>
+        <h3>Objective</h3>
+        <p>To showcase how AI can enhance classic games, making them interactive and challenging, while demonstrating practical AI applications for education and entertainment.</p>
+      </div>
+      <div class="info-card">
+        <i class="fa-solid fa-laptop-code"></i>
+        <h3>Technologies</h3>
+        <p>Python, JavaScript, HTML5, CSS3, TensorFlow.js, OpenCV.js, AI algorithms including Minimax, Heuristic Search, Backtracking, and Pathfinding.</p>
+      </div>
     </div>
+  </section>
 
-
-       <!-- Game 6: Connect Four -->
-    <div class="game-card">
-<img src="snake-game/connect.jpg" alt="Snake Game">
-      <h3>Connect Four (Minimax & Alpha-Beta Pruning)</h3>
-      <p>Play against AI using minimax and alpha-beta pruning techniques.</p>
-      <button onclick="window.location.href='connect-four/connect_four.html'">Play Game</button>
+  <!-- Contact Section -->
+  <section id="contact" style="padding:80px 20px; text-align:center; background: #282a36;">
+    <h2 style="margin-bottom:50px; font-size:2.5rem;">Contact <i class="fa-solid fa-envelope"></i></h2>
+    <div class="card-container">
+      <div class="info-card">
+        <i class="fa-solid fa-envelope"></i>
+        <h3>Email</h3>
+        <p><a href="mailto:riyasunilkharade.vit@gmail.com" style="color:#6c63ff;">riyasunilkharade.vit@gmail.com</a></p>
+      </div>
+      <div class="info-card">
+        <i class="fa-brands fa-github"></i>
+        <h3>GitHub</h3>
+        <p><a href="https://github.com/riya-kharade/AI-Game-Collection" target="_blank" style="color:#6c63ff;">github.com/riya-kharade/AI-Game-Collection</a></p>
+      </div>
+      <div class="info-card">
+        <i class="fa-solid fa-globe"></i>
+        <h3>Live Demo</h3>
+        <p><a href="https://ai-game-collection-byriya.netlify.app/" target="_blank" style="color:#6c63ff;">ai-games-by-byriya.netlify.app</a></p>
+      </div>
     </div>
+  </section>
 
-    
-    <!-- Game 1: Rock Paper Scissors -->
-    <div class="game-card">
-<img src="snake-game/rock.jpg" alt="Snake Game">
-      <h3>Rock Paper Scissors (Vision AI)</h3>
-      <p>Play using hand gestures detected by AI and OpenCV.</p>
-      <button onclick="runRockPaper()">Play Game</button>
-    </div>
-
-
-    <!-- Game 4: 2048 AI -->
-    <div class="game-card">
-<img src="snake-game/2048.jpg" alt="Snake Game">
-      <h3>2048 Game AI (Heuristic Search)</h3>
-      <p>AI uses heuristic search to help reach 2048 tiles faster.</p>
-      <button onclick="window.location.href='2048-ai/2048.html'">Play Game</button>
-    </div>
-
-    <!-- Game 5: Sudoku Solver -->
-    <div class="game-card">
-<img src="snake-game/sudoko.png" alt="Snake Game">
-      <h3>Sudoku Solver (Backtracking Algorithm)</h3>
-      <p>Enter a puzzle and AI solves it using backtracking.</p>
-      <button onclick="window.location.href='sudoku-solver/sudoku.html'">Play Game</button>
-    </div>
-
- 
-  </div>
-
-
+  <!-- Footer -->
   <footer>
-    © 2025 AI Game Collection | Built with ❤️ in Python
+    © 2025 AI Game Collection | Built with ❤️ by Riya | 
+    <a href="https://ai-game-collection-byriya.netlify.app/">Live Demo</a>
   </footer>
 
   <script>
