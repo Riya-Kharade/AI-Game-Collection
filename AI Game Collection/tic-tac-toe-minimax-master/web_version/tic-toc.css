@@ -1,0 +1,151 @@
+/* ===================== Body ===================== */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0f2027; /* optional, gaming feel */
+    color: #fff;
+}
+
+/* ===================== Header ===================== */
+header {
+    background: linear-gradient(135deg, #00AEEA, #20c997);
+    color: #fff;
+    text-align: center;
+    height: 70px;
+    line-height: 70px; /* vertical centering */
+    font-size: 1.5em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    margin: 0 0 60px 0;
+    padding: 0;
+    box-sizing: border-box;
+    position: relative;
+    width: 100%;
+    border-bottom: 3px solid #00FFE0;
+}
+
+/* ===================== Paragraphs ===================== */
+p {
+    font-size: 14pt;
+    font-weight: bold;
+    font-family: Sans-serif;
+    text-align: center;
+    margin: 0 auto 10px auto;
+    display: block;
+    position: relative;
+}
+
+/* ===================== Links ===================== */
+a {
+    color: #00AEEA;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #20c997;
+}
+
+a:visited {
+    color: #00AEEA;
+}
+
+/* ****************** Table style ****************** */
+/* ===================== Tic Tac Toe Table ===================== */
+#tab-tic-tac-toe {
+    margin: 0 auto;
+    padding: 0;
+    font-family: 'Sans-serif';
+    width: 310px;
+    height: 310px;
+    border: 3px solid #00AEEA;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 174, 234, 0.5);
+    background: #F8F8F8;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+/* ===================== Table Rows and Cells ===================== */
+#tab-tic-tac-toe td {
+    cursor: pointer;
+    width: 100px;
+    height: 100px;
+    font-size: 3em;
+    font-weight: bold;
+    color: #00AEEA;
+    background: linear-gradient(145deg, #e0e0e0, #cfcfcf);
+    border: 2px solid #CECECE;
+    transition: all 0.2s ease-in-out;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Remove double borders */
+#tab-tic-tac-toe td:first-child {
+    border-left: none;
+}
+#tab-tic-tac-toe tr:last-child td {
+    border-bottom: none;
+}
+
+/* Hover effect for cells */
+#tab-tic-tac-toe td:hover {
+    background: linear-gradient(145deg, #00AEEA, #20c997);
+    color: #fff;
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(0, 174, 234, 0.7);
+}
+
+/* Optional: X and O animation effect */
+#tab-tic-tac-toe td.x {
+    color: #ff3c3c;
+    text-shadow: 0 0 10px #ff3c3c;
+}
+
+#tab-tic-tac-toe td.o {
+    color: #00ffe0;
+    text-shadow: 0 0 10px #00ffe0;
+}
+
+/* ===================== Restart Button ===================== */
+#bnt-restart {
+    display: block;
+    padding: 12px 20px;
+    margin: 20px auto;
+    width: 220px;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(45deg, #00AEEA, #20C997);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 174, 234, 0.6);
+    transition: all 0.3s ease-in-out;
+    text-align: center;
+}
+
+/* Hover effect with glow */
+#bnt-restart:hover {
+    background: linear-gradient(45deg, #00FFE0, #1DC5FF);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #00FFE0, 0 0 40px #1DC5FF;
+}
+
+/* Active (clicked) effect */
+#bnt-restart:active {
+    transform: scale(0.95);
+    background: linear-gradient(45deg, #0787B3, #1DC5FF);
+    box-shadow: 0 0 15px #0787B3;
+}
+
+/* Disabled state */
+#bnt-restart:disabled {
+    color: #888;
+    background: #CECECE;
+    cursor: not-allowed;
+    box-shadow: none;
+}

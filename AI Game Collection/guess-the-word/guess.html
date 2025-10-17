@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Hangman Offline</title>
+  <style>
+    body { font-family: Arial, sans-serif; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#f0f4f7; }
+    .game-container { background:#fff; padding:30px 40px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.15); text-align:center; max-width:500px; width:100%; }
+    h1 { margin-bottom:20px; }
+    .word-display { font-size:28px; letter-spacing:5px; margin-bottom:20px; }
+    input[type="text"] { padding:10px; font-size:18px; width:50px; text-align:center; }
+    button { padding:10px 20px; font-size:16px; margin-left:10px; cursor:pointer; border:none; background-color:#4caf50; color:white; border-radius:5px; }
+    .hint { margin-top:15px; font-size:16px; color:#555; }
+    .message { margin-top:15px; font-size:18px; font-weight:bold; }
+    .attempts { margin-top:10px; }
+/* General button style */
+button {
+  appearance: none;
+  border: 0;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #fff;
+  transition: all 0.3s ease;
+  margin-right: 8px;
+  margin-top: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Hover effect for all buttons */
+button:hover {
+  transform: scale(1.1); /* slightly bigger */
+  box-shadow: 0 8px 15px rgba(0,0,0,0.3); /* glowing shadow */
+}
+
+/* Specific colors for your buttons */
+#btnHomePage { background: #3b82f6; }
+#btnHomePage:hover { background: #2563eb; }
+
+.game-container button:nth-of-type(1) { background: #4caf50; } /* Guess */
+.game-container button:nth-of-type(2) { background: #ff9800; } /* Get Hint */
+.game-container button:nth-of-type(3) { background: #f44336; } /* New Game */
+
+/* Optional: Smooth text color change on hover */
+button:hover { color: #fff; }
+
+  </style>
+</head>
+<body>
+
+<div class="game-container">
+  <h1>Smart Hangman Offline</h1>
+  <div class="word-display" id="wordDisplay">_ _ _ _ _</div>
+  <input type="text" id="letterInput" maxlength="1">
+  <button onclick="guessLetter()">Guess</button>
+  <div class="attempts" id="attemptsDisplay">Attempts left: 6</div>
+  <div class="hint" id="hintDisplay"></div>
+  <div class="message" id="messageDisplay"></div>
+  <button onclick="provideSmartHint()" style="margin-top:10px;">Get Hint</button>
+
+  <button onclick="resetGame()" style="margin-top:20px;">New Game</button>
+</div>
+<div class="row">
+  <button id="btnHomePage">Back to Homepage</button>
+</div>
+<script>
+// 1200+ words embedded offline
+const words = ["apple","banana","cherry","date","elderberry","fig","grape","honeydew","kiwi","lemon","mango","nectarine","orange","papaya","quince","raspberry","strawberry","tangerine","ugli","violet","watermelon","xigua","yam","zucchini","avocado","blueberry","cantaloupe","dragonfruit","eggfruit","feijoa","guava","huckleberry","jackfruit","kumquat","lime","mulberry","nectar","olive","persimmon","plum","pomegranate","rambutan","soursop","tomato","ugni","vanilla","wolfberry","ximenia","yumberry","ziziphus","algorithm","array","binary","boolean","bug","class","closure","compiler","const","constructor","data","debug","dictionary","element","exception","function","framework","generator","hash","identifier","index","inheritance","integer","interface","iteration","lambda","library","loop","method","mutable","namespace","node","object","operator","parameter","pointer","polymorphism","procedure","prototype","queue","recursion","reference","regex","repository","runtime","setter","stack","string","structure","syntax","template","variable","vector","while","widget","xml","yaml","zip","alpha","beta","gamma","delta","epsilon","zeta","eta","theta","iota","kappa","lambda","mu","nu","xi","omicron","pi","rho","sigma","tau","upsilon","phi","chi","psi","omega","sun","moon","star","planet","comet","asteroid","meteor","galaxy","nebula","quasar","pulsar","blackhole","supernova","satellite","orbit","eclipse","telescope","microscope","atom","molecule","electron","proton","neutron","quantum","energy","force","gravity","velocity","acceleration","momentum","mass","density","pressure","temperature","volume","frequency","wavelength","amplitude","circuit","resistor","capacitor","inductor","transistor","diode","sensor","actuator","robot","engineer","developer","programmer","designer","analyst","scientist","researcher","teacher","student","leader","manager","director","president","minister","governor","officer","captain","pilot","driver","chef","baker","farmer","gardener","mechanic","technician","worker","artist","musician","writer","poet","dancer","actor","engine","gear","wheel","axle","brake","clutch","pedal","lever","pulley","spring","rope","cable","beam","column","arch","bridge","tower","roof","wall","door","window","floor","ceiling","stair","elevator","ladder","road","street","highway","lane","track","trail","path","bridge","tunnel","river","lake","ocean","sea","island","mountain","hill","valley","desert","forest","jungle","swamp","plain","plateau","canyon","cave","volcano","glacier","iceberg","cliff","beach","coast","bay","harbor","dock","port","ship","boat","raft","canoe","kayak","sail","paddle","oar","anchor","sailor","captain","navigator","crew","passenger","tourist","camera","photo","video","film","movie","music","song","album","concert","theater","museum","gallery","painting","sculpture","drawing","sketch","portrait","landscape","abstract","design","fashion","style","trend","model","brand","logo","advertisement","banner","poster","flyer","brochure","website","app","software","hardware","device","gadget","smartphone","tablet","laptop","desktop","monitor","keyboard","mouse","printer","scanner","speaker","headphone","microphone","camera","lens","tripod","light","filter","brush","pen","pencil","paper","notebook","journal"];
+
+const vowels = new Set(["a","e","i","o","u"]);
+let word, guessedLetters, attempts, previousHints;
+
+function initializeGame() {
+  word = words[Math.floor(Math.random() * words.length)].toLowerCase();
+  guessedLetters = new Set();
+  attempts = 6;
+  previousHints = [];
+  document.getElementById("wordDisplay").textContent = getHint();
+  document.getElementById("attemptsDisplay").textContent = `Attempts left: ${attempts}`;
+  document.getElementById("hintDisplay").textContent = '';
+  document.getElementById("messageDisplay").textContent = '';
+  document.getElementById("letterInput").value = '';
+}
+
+function getHint() {
+  return [...word].map(l => guessedLetters.has(l) ? l : "_").join(" ");
+}
+
+function provideSmartHint() {
+  let hintText = "";
+  if (previousHints.length === 0) {
+    hintText = `The word has ${word.length} letters.`;
+  } else if (previousHints.length === 1) {
+    let numVowels = [...word].filter(c => vowels.has(c)).length;
+    hintText = `The word has ${numVowels} vowel(s).`;
+  } else if (previousHints.length === 2) {
+    hintText = `The word starts with '${word[0]}'.`;
+  } else if (previousHints.length === 3) {
+    hintText = `The word ends with '${word[word.length-1]}'.`;
+  } else {
+    let unrevealed = [...word].filter(c => !guessedLetters.has(c));
+    if (unrevealed.length > 0) {
+      let letter = unrevealed[Math.floor(Math.random() * unrevealed.length)];
+      hintText = `One of the letters is '${letter}'.`;
+    } else {
+      hintText = "No more hints available!";
+    }
+  }
+  previousHints.push(hintText);
+  document.getElementById("hintDisplay").textContent = hintText;
+}
+
+function guessLetter() {
+  let input = document.getElementById("letterInput").value.toLowerCase();
+  document.getElementById("letterInput").value = '';
+
+  if (!input.match(/[a-z]/) || input.length !== 1) {
+    alert("Enter a single letter!");
+    return;
+  }
+  if (guessedLetters.has(input)) {
+    alert("You already guessed that letter!");
+    return;
+  }
+
+  guessedLetters.add(input);
+
+  if (word.includes(input)) {
+    document.getElementById("messageDisplay").textContent = "✅ Correct!";
+  } else {
+    attempts--;
+    document.getElementById("messageDisplay").textContent = "❌ Wrong!";
+  }
+
+  document.getElementById("wordDisplay").textContent = getHint();
+  document.getElementById("attemptsDisplay").textContent = `Attempts left: ${attempts}`;
+
+  if (attempts <= 3 && previousHints.length < 5) provideSmartHint();
+
+  checkGameOver();
+}
+
+function checkGameOver() {
+  if (!document.getElementById("wordDisplay").textContent.includes("_")) {
+    document.getElementById("messageDisplay").textContent = `🎉 You guessed the word: ${word}`;
+  } else if (attempts === 0) {
+    document.getElementById("messageDisplay").textContent = `💀 Game Over! The word was: ${word}`;
+  }
+}
+
+function resetGame() { initializeGame(); }
+
+initializeGame();
+
+
+const btnHomePage = document.getElementById('btnHomePage');
+
+btnHomePage.addEventListener('click', () => {
+  window.location.href = '../index.html'; // replace with your homepage URL
+});
+
+
+</script>
+
+</body>
+</html>

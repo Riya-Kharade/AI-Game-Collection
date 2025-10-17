@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!--
+		Tic Tac Toe with Minimax AI Algorithm
+		Author: Clederson Cruz
+		Year: 2017
+		License: GNU GENERAL PUBLIC LICENSE (GPL)
+		-->
+
+		<meta charset="UTF-8" />
+		<meta content="Clederson Cruz" name="author" />
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<link type="text/css" rel="stylesheet" href="web_version/tic-toc.css" />
+		<script type="text/javascript" src="web_version/tic-toc.js"></script>
+		<title>Tic Toc Toe- Minimax</title>
+		<style>
+		/* ===================== General Buttons ===================== */
+button {
+    display: block;
+    padding: 12px 20px;
+    margin: 2px auto;
+    width: 350px;
+    font-size: 1em;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(45deg, #00AEEA, #20C997);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 174, 234, 0.6);
+    transition: all 0.3s ease-in-out;
+    text-align: center;
+}
+
+/* Hover effect with glow */
+button:hover {
+    background: linear-gradient(45deg, #00FFE0, #1DC5FF);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #00FFE0, 0 0 40px #1DC5FF;
+}
+
+/* Active (clicked) effect */
+button:active {
+    transform: scale(0.95);
+    background: linear-gradient(45deg, #0787B3, #1DC5FF);
+    box-shadow: 0 0 15px #0787B3;
+}
+
+/* ===================== Back to Homepage Button ===================== */
+#btnHomePage {
+    background: linear-gradient(45deg, #ff6b6b, #f06595);
+    width: 250px;
+    color: #fff;
+}
+
+#btnHomePage:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(255, 107, 107, 0.8);
+}
+
+
+		</style>
+	</head>
+	<body>
+		<header>
+			<p>Minimax Algorithm</p>
+		</header>
+			<br />
+			<p id="message"></p>
+			<br />
+		<table id="tab-tic-tac-toe" cellspacing="0">
+			<tr><td id="00" onclick="clickedCell(this)"></td><td id="01" onclick="clickedCell(this)"></td><td id="02" onclick="clickedCell(this)"></td></tr>
+			<tr><td id="10" onclick="clickedCell(this)"></td><td id="11" onclick="clickedCell(this)"></td><td id="12" onclick="clickedCell(this)"></td></tr>
+			<tr><td id="20" onclick="clickedCell(this)"></td><td id="21" onclick="clickedCell(this)"></td><td id="22" onclick="clickedCell(this)"></td></tr>
+		</table>
+		<br><br>
+		<input type="button" value="Start AI" id="bnt-restart" onclick="restartBnt(this)"/>
+		<br />
+<div class="row">
+  <button id="btnHomePage">Back to Homepage</button>
+</div>
+
+
+<script>
+	
+const btnHomePage = document.getElementById('btnHomePage');
+
+btnHomePage.addEventListener('click', () => {
+  window.location.href = '../index.html'; // replace with your homepage URL
+});
+
+
+</script>
+	</body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connect Four Smart AI</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #0b1b2b;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  h1 { margin-bottom: 10px; }
+  #status { margin-bottom: 20px; font-size: 18px; }
+  .board {
+    display: grid;
+    grid-template-columns: repeat(7, 60px);
+    grid-template-rows: repeat(6, 60px);
+    gap: 5px;
+    background: #183b6a;
+    padding: 5px;
+    border-radius: 10px;
+  }
+  .cell {
+    width: 60px;
+    height: 60px;
+    background: #071427;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .cell:hover { transform: scale(1.1); }
+  .red { background: #ff4c4c; }
+  .yellow { background: #ffe74c; }
+  button {
+    margin-top: 15px;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background: #22c55e;
+    color: #000;
+  }
+
+  #btnHomePage {
+  margin-top: 10px;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #3b82f6;
+  color: #fff;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#btnHomePage:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.6);
+}
+
+</style>
+</head>
+<body>
+
+<h1>Connect Four - Smart AI</h1>
+<div id="status">Player Red's turn</div>
+<div class="board" id="board"></div>
+<button id="restart">Restart Game</button>
+<button id="btnHomePage">Back to Homepage</button>
+
+<script>
+const ROWS = 6;
+const COLS = 7;
+let board = [];
+let currentPlayer = 'red';
+let gameOver = false;
+const humanPlayer = 'red';
+const aiPlayer = 'yellow';
+const MAX_DEPTH = 5; // depth can be 5 for smarter AI
+
+const boardDiv = document.getElementById('board');
+const statusDiv = document.getElementById('status');
+const restartBtn = document.getElementById('restart');
+
+function initBoard() {
+  boardDiv.innerHTML = '';
+  board = [];
+  gameOver = false;
+  currentPlayer = humanPlayer;
+  statusDiv.textContent = "Player Red's turn";
+  for(let r=0;r<ROWS;r++){
+    board[r] = [];
+    for(let c=0;c<COLS;c++){
+      board[r][c] = null;
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.dataset.row = r;
+      cell.dataset.col = c;
+      cell.addEventListener('click', handleMove);
+      boardDiv.appendChild(cell);
+    }
+  }
+}
+
+function handleMove(e){
+  if(gameOver || currentPlayer === aiPlayer) return;
+  const col = parseInt(e.target.dataset.col);
+  makeMove(col, humanPlayer);
+}
+
+function makeMove(col, player){
+  if(gameOver) return;
+  const row = getRow(col);
+  if(row === -1) return;
+
+  board[row][col] = player;
+  const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+  cell.classList.add(player);
+
+  if(checkWin(row,col)){
+    statusDiv.textContent = `Player ${player.charAt(0).toUpperCase()+player.slice(1)} wins!`;
+    gameOver = true;
+    return;
+  }
+
+  if(board.flat().every(cell=>cell!==null)){
+    statusDiv.textContent = "It's a draw!";
+    gameOver = true;
+    return;
+  }
+
+  currentPlayer = (player === humanPlayer) ? aiPlayer : humanPlayer;
+  statusDiv.textContent = `Player ${currentPlayer.charAt(0).toUpperCase()+currentPlayer.slice(1)}'s turn`;
+
+  if(currentPlayer === aiPlayer){
+    setTimeout(()=>makeMove(bestMove(), aiPlayer), 200);
+  }
+}
+
+function getRow(col){
+  let row = ROWS-1;
+  while(row>=0 && board[row][col]!==null) row--;
+  return row;
+}
+
+function checkWin(row,col){
+  const player = board[row][col];
+  const directions = [
+    [[0,1],[0,-1]],
+    [[1,0],[-1,0]],
+    [[1,1],[-1,-1]],
+    [[1,-1],[-1,1]]
+  ];
+  for(const [[dx1,dy1],[dx2,dy2]] of directions){
+    let count=1;
+    for(const [dx,dy] of [[dx1,dy1],[dx2,dy2]]){
+      let r=row+dx, c=col+dy;
+      while(r>=0 && r<ROWS && c>=0 && c<COLS && board[r][c]===player){
+        count++; r+=dx; c+=dy;
+      }
+    }
+    if(count>=4) return true;
+  }
+  return false;
+}
+
+// Minimax AI with evaluation function
+function bestMove(){
+  let bestScore = -Infinity;
+  let move = 0;
+  for(let c=0;c<COLS;c++){
+    let r = getRow(c);
+    if(r===-1) continue;
+    board[r][c] = aiPlayer;
+    let score = minimax(board, MAX_DEPTH, false, -Infinity, Infinity);
+    board[r][c] = null;
+    if(score > bestScore){ bestScore = score; move = c; }
+  }
+  return move;
+}
+
+function minimax(boardState, depth, isMaximizing, alpha, beta){
+  if(depth===0 || isTerminal(boardState)){
+    return evaluate(boardState);
+  }
+
+  if(isMaximizing){
+    let maxEval = -Infinity;
+    for(let c=0;c<COLS;c++){
+      let r = getRowCol(boardState, c);
+      if(r===-1) continue;
+      boardState[r][c] = aiPlayer;
+      let evalScore = minimax(boardState, depth-1, false, alpha, beta);
+      boardState[r][c] = null;
+      maxEval = Math.max(maxEval, evalScore);
+      alpha = Math.max(alpha, evalScore);
+      if(beta <= alpha) break;
+    }
+    return maxEval;
+  } else {
+    let minEval = Infinity;
+    for(let c=0;c<COLS;c++){
+      let r = getRowCol(boardState, c);
+      if(r===-1) continue;
+      boardState[r][c] = humanPlayer;
+      let evalScore = minimax(boardState, depth-1, true, alpha, beta);
+      boardState[r][c] = null;
+      minEval = Math.min(minEval, evalScore);
+      beta = Math.min(beta, evalScore);
+      if(beta <= alpha) break;
+    }
+    return minEval;
+  }
+}
+
+function getRowCol(state, col){
+  let row = ROWS-1;
+  while(row>=0 && state[row][col]!==null) row--;
+  return row;
+}
+
+function isTerminal(state){
+  return checkBoardWin(state, aiPlayer) || checkBoardWin(state, humanPlayer) || state.flat().every(c=>c!==null);
+}
+
+function checkBoardWin(state, player){
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      if(state[r][c]===player && checkWinBoard(state,r,c,player)) return true;
+    }
+  }
+  return false;
+}
+
+function checkWinBoard(state,row,col,player){
+  const directions = [
+    [[0,1],[0,-1]],
+    [[1,0],[-1,0]],
+    [[1,1],[-1,-1]],
+    [[1,-1],[-1,1]]
+  ];
+  for(const [[dx1,dy1],[dx2,dy2]] of directions){
+    let count=1;
+    for(const [dx,dy] of [[dx1,dy1],[dx2,dy2]]){
+      let r=row+dx, c=col+dy;
+      while(r>=0 && r<ROWS && c>=0 && c<COLS && state[r][c]===player){
+        count++; r+=dx; c+=dy;
+      }
+    }
+    if(count>=4) return true;
+  }
+  return false;
+}
+
+// Smarter evaluation
+function evaluate(state){
+  let score = 0;
+
+  // Center column preference
+  for(let r=0;r<ROWS;r++){
+    if(state[r][Math.floor(COLS/2)]===aiPlayer) score += 3;
+    if(state[r][Math.floor(COLS/2)]===humanPlayer) score -= 3;
+  }
+
+  // Horizontal, vertical, diagonal scoring
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      if(state[r][c]===null) continue;
+      score += evaluatePosition(state,r,c,aiPlayer);
+      score -= evaluatePosition(state,r,c,humanPlayer);
+    }
+  }
+  return score;
+}
+
+function evaluatePosition(state,row,col,player){
+  let score = 0;
+  const directions = [
+    [0,1], [1,0], [1,1], [1,-1]
+  ];
+  for(const [dx,dy] of directions){
+    let count=0;
+    let block=0;
+    for(let i=-3;i<=3;i++){
+      let r=row+i*dx, c=col+i*dy;
+      if(r>=0 && r<ROWS && c>=0 && c<COLS){
+        if(state[r][c]===player) count++;
+        else if(state[r][c]!==null) block++;
+      } else block++;
+    }
+    if(block===0 && count>0) score += Math.pow(10,count);
+  }
+  return score;
+}
+
+restartBtn.addEventListener('click', initBoard);
+initBoard();
+const btnHomePage = document.getElementById('btnHomePage');
+btnHomePage.addEventListener('click', () => {
+  window.location.href = '../index.html'; // replace with your homepage URL
+});
+
+</script>
+</body>
+</html>

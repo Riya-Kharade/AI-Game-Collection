@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Snake + AI (A* pathfinding)</title>
+  <style>
+    :root{--bg:#0f1724;--panel:#0b1220;--accent:#22c55e;--muted:#94a3b8}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Arial;color: #e6eef8;background:var(--bg);display:flex;align-items:center;justify-content:center}
+    .wrap{display:flex;gap:20px;padding:20px}
+    .game{background:var(--panel);padding:14px;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,.6)}
+    canvas{background:#071427;display:block;border-radius:8px}
+    .ui{display:flex;flex-direction:column;gap:8px;color:var(--muted);width:260px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:12px;border-radius:10px}
+    button,select,input{appearance:none;border:0;background:#0b1b2b;color:#dff3e8;padding:8px 10px;border-radius:8px;cursor:pointer}
+    button.toggle{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+    .row{display:flex;gap:8px}
+    .small{font-size:13px;color:var(--muted)}
+    .credits{font-size:12px;color:#9fb4c8}
+    .hint{font-size:13px;color:#bcd7c7}
+    /* Buttons CSS */
+button {
+  appearance: none;
+  border: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #fff;
+  transition: background 0.3s;
+  margin-right: 8px;
+  margin-top: 20px;
+}
+
+
+#btnHomePage { background: #3b82f6; }
+#btnHomePage:hover { background: #2563eb; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="game card">
+      <canvas id="c" width="480" height="480"></canvas>
+    </div>
+
+    <div class="ui">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <h3 style="margin:0;color:#dff3e8">Snake + A* AI</h3>
+            <div class="small">Automatically restarts when snake fills the board.</div>
+          </div>
+          <div style="text-align:right">
+            <div id="score" style="font-size:20px;color:var(--accent)">Score: 0</div>
+            <div id="status" class="small">Running</div>
+          </div>
+        </div>
+        <hr style="border:none;height:1px;background:rgba(255,255,255,0.03);margin:10px 0">
+        <div class="row" style="margin-bottom:8px">
+          <button id="btnStart">Start / Restart</button>
+          <button id="btnAI" class="toggle">AI: Off</button>
+        </div>
+        <div class="row">
+          <label class="small">Speed</label>
+          <input id="speed" type="range" min="4" max="20" value="10">
+        </div>
+        <div style="margin-top:8px" class="small hint">Controls: Arrow keys / WASD. AI uses A* search to find food.</div>
+    <!-- Buttons HTML -->
+<div class="row">
+  <button id="btnHomePage">Back to Homepage</button>
+</div>
+
+      </div>
+    </div>
+    
+  </div>
+
+
+<script>
+(() => {
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const scoreEl = document.getElementById('score');
+  const statusEl = document.getElementById('status');
+  const btnStart = document.getElementById('btnStart');
+  const btnAI = document.getElementById('btnAI');
+  const speedInput = document.getElementById('speed');
+
+  const GRID = 24;
+  const CELL = canvas.width / GRID;
+
+  let snake, dir, food, running, aiEnabled;
+  let lastTick = 0;
+
+  function reset(){
+    snake = [{x: Math.floor(GRID/2), y: Math.floor(GRID/2)}];
+    dir = {x:1,y:0};
+    placeFood();
+    running = true;
+    scoreEl.textContent = 'Score: 0';
+    statusEl.textContent = 'Running';
+  }
+
+  function placeFood(){
+    while(true){
+      const p = {x: rand(0,GRID-1), y: rand(0,GRID-1)};
+      if(!snake.some(s => s.x===p.x && s.y===p.y)) { food = p; break; }
+    }
+  }
+
+  function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = '#071427';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    roundRect(food.x*CELL+4, food.y*CELL+4, CELL-8, CELL-8, 6, '#ff5c5c');
+
+    for(let i=snake.length-1;i>=0;i--){
+      const s = snake[i];
+      const t = i===0 ? '#60a5fa' : '#183b6a';
+      ctx.fillStyle = t;
+      roundRect(s.x*CELL+2, s.y*CELL+2, CELL-4, CELL-4, 6);
+    }
+  }
+
+  function roundRect(x,y,w,h,r,color){
+    if(color) ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.fill();
+  }
+
+  function step(){
+    if(aiEnabled){
+      const next = aiNextMove();
+      if(next) dir = next;
+    }
+
+    const head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
+    if(head.x<0||head.x>=GRID||head.y<0||head.y>=GRID || snake.some(s=>s.x===head.x && s.y===head.y)){
+      restartGame();
+      return;
+    }
+
+    snake.unshift(head);
+    if(head.x===food.x && head.y===food.y){
+      placeFood();
+      scoreEl.textContent = 'Score: ' + (snake.length-1);
+    } else {
+      snake.pop();
+    }
+
+    // If snake fills the entire grid, restart automatically
+    if(snake.length >= GRID*GRID){
+      restartGame();
+    }
+  }
+
+  function restartGame(){
+    reset();
+    if(aiEnabled) btnAI.textContent = 'AI: On';
+  }
+
+  function aiNextMove(){
+    const start = snake[0];
+    const goal = food;
+    const occupied = new Set(snake.map(s => s.x + ',' + s.y));
+
+    function neighbors(node){
+      const n = [];
+      [[1,0],[-1,0],[0,1],[0,-1]].forEach(d=>{
+        const nx=node.x+d[0], ny=node.y+d[1];
+        if(nx>=0 && nx<GRID && ny>=0 && ny<GRID){
+          const key = nx+','+ny;
+          const tail = snake[snake.length-1];
+          if(key===tail.x+','+tail.y || !occupied.has(key)) n.push({x:nx,y:ny});
+        }
+      });
+      return n;
+    }
+
+    function h(a,b){ return Math.abs(a.x-b.x)+Math.abs(a.y-b.y); }
+
+    const open = new TinyPQ((a,b)=>a.f - b.f);
+    const startKey = start.x+','+start.y;
+    open.push({x:start.x,y:start.y,g:0,f:h(start,goal)});
+    const cameFrom = new Map();
+    const gScore = new Map(); gScore.set(startKey,0);
+
+    const visited = new Set();
+    let found=false;
+    let goalNode = null;
+
+    while(open.size()){ 
+      const current = open.pop();
+      const key = current.x+','+current.y;
+      if(visited.has(key)) continue;
+      visited.add(key);
+      if(current.x===goal.x && current.y===goal.y){ found=true; goalNode=current; break; }
+      for(const nb of neighbors(current)){
+        const nk = nb.x+','+nb.y;
+        const tentative = current.g + 1;
+        if(tentative < (gScore.get(nk) ?? Infinity)){
+          gScore.set(nk, tentative);
+          const node = {x:nb.x,y:nb.y,g:tentative,f: tentative + h(nb,goal)};
+          cameFrom.set(nk, key);
+          open.push(node);
+        }
+      }
+    }
+
+    if(found){
+      const path = [];
+      let curKey = goal.x+','+goal.y;
+      while(curKey !== startKey){
+        const p = curKey.split(',').map(Number);
+        path.push({x:p[0],y:p[1]});
+        curKey = cameFrom.get(curKey);
+        if(!curKey) break;
+      }
+      path.reverse();
+      if(path.length>0){
+        const next = path[0];
+        return {x: next.x - start.x, y: next.y - start.y};
+      }
+    }
+
+    const moves = [[1,0],[-1,0],[0,1],[0,-1]];
+    for(const m of moves){
+      const nx = start.x + m[0], ny = start.y + m[1];
+      if(nx>=0 && nx<GRID && ny>=0 && ny<GRID && !snake.some(s=>s.x===nx&&s.y===ny)){
+        return {x:m[0], y:m[1]};
+      }
+    }
+    return null;
+  }
+
+  function TinyPQ(cmp){ this._arr=[]; this._cmp=cmp; }
+  TinyPQ.prototype.push = function(x){ this._arr.push(x); this._arr.sort(this._cmp); };
+  TinyPQ.prototype.pop = function(){ return this._arr.shift(); };
+  TinyPQ.prototype.size = function(){ return this._arr.length; };
+
+  window.addEventListener('keydown', e => {
+    const k = e.key;
+    if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','a','s','d','W','A','S','D'].includes(k)){
+      const map = {ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0},w:{x:0,y:-1},s:{x:0,y:1},a:{x:-1,y:0},d:{x:1,y:0},W:{x:0,y:-1},S:{x:0,y:1},A:{x:-1,y:0},D:{x:1,y:0}};
+      const nd = map[k];
+      if(nd.x !== -dir.x || nd.y !== -dir.y) { dir = nd; aiEnabled=false; btnAI.textContent='AI: Off'; }
+    }
+  });
+
+  btnStart.addEventListener('click', reset);
+  btnAI.addEventListener('click', ()=>{ aiEnabled = !aiEnabled; btnAI.textContent = 'AI: ' + (aiEnabled ? 'On' : 'Off'); });
+
+  function loop(ts){
+    if(!lastTick) lastTick = ts;
+    const speed = Number(speedInput.value);
+    const delta = 1000 / speed;
+    if(ts - lastTick >= delta && running){
+      step(); lastTick = ts;
+    }
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  reset();
+  requestAnimationFrame(loop);
+})();
+
+const btnHomePage = document.getElementById('btnHomePage');
+
+btnHomePage.addEventListener('click', () => {
+  window.location.href = '../index.html'; // replace with your homepage URL
+});
+
+
+</script>
+</body>
+</html>

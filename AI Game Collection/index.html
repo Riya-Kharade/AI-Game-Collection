@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Game Collection 🎮</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #1e1f29, #282a36);
+      color: white;
+      text-align: center;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: #ccc;
+      margin-bottom: 40px;
+    }
+
+   .game-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* exactly 3 cards per row */
+  gap: 40px; /* space between cards */
+  justify-items: center;
+  margin: 50px auto;
+  width: 90%; /* optional, keeps it centered nicely */
+}
+
+    .game-card {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 15px;
+      padding: 25px;
+      width: 250px;
+      transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .game-card:hover {
+      transform: translateY(-12px) scale(1.05);
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 15px 25px rgba(0,0,0,0.4);
+    }
+
+    .game-card img {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 15px;
+    }
+
+    .game-card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 5px;
+    }
+
+    .game-card p {
+      font-size: 0.95rem;
+      color: #ccc;
+      margin-bottom: 15px;
+    }
+
+    .game-card button {
+      background: #6c63ff;
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .game-card button:hover {
+      background: #5a54e3;
+    }
+
+    footer {
+      margin-top: 40px;
+      color: #999;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 AI Game Collection</h1>
+  <p>Play fun AI-powered games  powered by Python and AI!</p>
+
+  <div class="game-container">
+
+
+    <!-- Game 2: Snake Game -->
+    <div class="game-card">
+<img src="snake-game/snake.jpg" alt="Snake Game">
+      <h3>Snake Game (Pathfinding)</h3>
+      <p>AI finds the optimal path to eat food and avoid obstacles.</p>
+      <button onclick="window.location.href='snake-game/snake.html'">Play Game</button>
+    </div>
+
+
+    <!-- Game: Tic Tac Toe -->
+<div class="game-card">
+<img src="snake-game/tic-toc.jpg" alt="Snake Game">
+  <h3>Tic Tac Toe (Minimax AI)</h3>
+  <p>Play Tic Tac Toe against an AI using the Minimax algorithm for perfect moves.</p>
+  <button onclick="window.location.href='tic-tac-toe-minimax-master/tic-toc.html'">Play Game</button>
+</div>
+
+
+    <!-- Game 3: Guess the Word -->
+    <div class="game-card">
+<img src="snake-game/guess.jpg" alt="Snake Game">
+      <h3>Guess the Word (Knowledge Representation )</h3>
+      <p>Rule-based AI helps you guess the word step by step.</p>
+      <button onclick="window.location.href='guess-the-word/guess.html'">Play Game</button>
+    </div>
+
+
+       <!-- Game 6: Connect Four -->
+    <div class="game-card">
+<img src="snake-game/connect.jpg" alt="Snake Game">
+      <h3>Connect Four (Minimax & Alpha-Beta Pruning)</h3>
+      <p>Play against AI using minimax and alpha-beta pruning techniques.</p>
+      <button onclick="window.location.href='connect-four/connect_four.html'">Play Game</button>
+    </div>
+
+    
+    <!-- Game 1: Rock Paper Scissors -->
+    <div class="game-card">
+<img src="snake-game/rock.jpg" alt="Snake Game">
+      <h3>Rock Paper Scissors (Vision AI)</h3>
+      <p>Play using hand gestures detected by AI and OpenCV.</p>
+      <button onclick="runRockPaper()">Play Game</button>
+    </div>
+
+
+    <!-- Game 4: 2048 AI -->
+    <div class="game-card">
+<img src="snake-game/2048.jpg" alt="Snake Game">
+      <h3>2048 Game AI (Heuristic Search)</h3>
+      <p>AI uses heuristic search to help reach 2048 tiles faster.</p>
+      <button onclick="window.location.href='2048-ai/2048.html'">Play Game</button>
+    </div>
+
+    <!-- Game 5: Sudoku Solver -->
+    <div class="game-card">
+<img src="snake-game/sudoko.png" alt="Snake Game">
+      <h3>Sudoku Solver (Backtracking Algorithm)</h3>
+      <p>Enter a puzzle and AI solves it using backtracking.</p>
+      <button onclick="window.location.href='sudoku-solver/sudoku.html'">Play Game</button>
+    </div>
+
+ 
+  </div>
+
+
+  <footer>
+    © 2025 AI Game Collection | Built with ❤️ in Python
+  </footer>
+
+  <script>
+    function runRockPaper() {
+      fetch('http://localhost:5000/run_rock_paper')
+        .then(response => alert("Rock Paper Scissors game started! Check your camera window."))
+        .catch(err => alert("Make sure Flask server is running to open Rock Paper Scissors game."));
+    }
+  </script>
+</body>
+</html>
